@@ -12,7 +12,12 @@ def createGeneratorIP102(architecture):
     if (architecture == 'Xception'):
         image_size = (299, 299)
         datagen = tf.keras.preprocessing.image.ImageDataGenerator(
-            preprocessing_function=preprocess_xc
+            preprocessing_function=preprocess_xc,
+            #rescale=1./255,
+            #rotation_range=20,
+            #width_shift_range=0.2,
+            #height_shift_range=0.2,
+            #horizontal_flip=True
         )
     elif (architecture == 'ResNet152'):
         image_size = (224, 224)

@@ -1,5 +1,7 @@
 import math
 import numpy as np
+from fitness import fitness
+import random
 
 def initializeSolutions(population_size):
     solutions = []
@@ -8,7 +10,7 @@ def initializeSolutions(population_size):
     while iteration < population_size:
         solution = []
         for _ in range(6):
-            solution.append(np.random.rand()*100)
+            solution.append(random.uniform(0, 100))
         solutions.append(solution)
         value += 20
         iteration += 1
@@ -42,14 +44,14 @@ def rastriginFunction(solution):
     final = total_sum + a_consant*6
     return final
 
-def fitness(solution):
-    best_solution = [45, 63, 83, 14, 27, 71]
-    difference_sum = 0
-    for index, variable in enumerate(solution):
-        difference_sum += (variable - best_solution[index]) ** 2
-    r = math.sqrt(difference_sum)
-    fitness = 0 - r
-    return fitness
+#def fitness(solution):
+    #best_solution = [45, 63, 83, 14, 27, 71]
+    #difference_sum = 0
+    #for index, variable in enumerate(solution):
+        #difference_sum += (variable - best_solution[index]) ** 2
+    #r = math.sqrt(difference_sum)
+    #fitness = 0 - r
+    #return fitness
 
 
 def relativeAttractiveness(beta0, gamma, r):
@@ -86,15 +88,18 @@ def newBeta0(beta0):
     else:
         return beta0
 
-def fireflyAlgorithm(population_size, max_iteration):
+def fireflyAlgorithm(population_size, max_iteration, architecture, dataset):
     
     #Inicialiazndo a população de vagalumes
     fireflies = initializeSolutions(population_size)
 
     #Calculando a intensidade de luz de cada vagalume
     light_intensities = []
-    for firefly in fireflies:
-        light_intensity = fitness(firefly)
+    for index, firefly in enumerate(fireflies):
+        with open('metaheuristics/output.txt', 'w') as file:
+            file.write(f'Vagalume inicial {index+1}\n')
+            file.write(f' Vagalume: {firefly}\n')
+        light_intensity = fitness(architecture, firefly, dataset)
         light_intensities.append(light_intensity)
 
     #Definindo o coeficiente de absorção de luz
@@ -110,37 +115,37 @@ def fireflyAlgorithm(population_size, max_iteration):
     j_firefly = 1
     iteration = 0
     evaluations = 10
-    with open('output.txt', 'w') as file:
+    with open('metaheuristics/output.txt', 'w') as file:
         file.write(f'População inicial: {fireflies}\n')
         file.write(f'Intensidade inicial: {light_intensities}\n')
         while iteration < max_iteration:
             print(iteration)
-            #file.write(f'Começando a iteração {iteration}\n')
+            file.write(f'Começando a iteração {iteration}\n')
             while i_firefly < population_size:
-                #file.write(f' AVALIANDO O VAGALUME {i_firefly}\n')
+                file.write(f' AVALIANDO O VAGALUME {i_firefly}\n')
                 while j_firefly < population_size:
                     if (i_firefly != j_firefly):
-                        #file.write(f'  Comparando com o vagalume {j_firefly}\n')
+                        file.write(f'  Comparando com o vagalume {j_firefly}\n')
                         #Caso o vagalume j seja mais luminoso que o vagalume i
                         if(light_intensities[i_firefly] < light_intensities[j_firefly]):
-                            #file.write(f'    O vagalume {j_firefly} é mais luminoso que o vagalume {i_firefly}\n')
-                            #file.write(f'    Vagalume i: {fireflies[i_firefly]}\n')
-                            #file.write(f'    Vagalume j: {fireflies[j_firefly]}')
+                            file.write(f'    O vagalume {j_firefly} é mais luminoso que o vagalume {i_firefly}\n')
+                            file.write(f'    Vagalume i: {fireflies[i_firefly]}\n')
+                            file.write(f'    Vagalume j: {fireflies[j_firefly]}')
                             #Calculando a distância entre os vagalumes
                             r = calc_distance(fireflies[i_firefly], fireflies[j_firefly])
-                            #file.write(f'    A distância entre eles é de {r}\n')
+                            file.write(f'    A distância entre eles é de {r}\n')
                             #Calculando a atratividade
                             beta = relativeAttractiveness(beta0, gamma, r)
-                            #file.write(f'    A atratividade entre eles é {beta}\n')
+                            file.write(f'    A atratividade entre eles é {beta}\n')
                             #Movendo o vagalume i em direção ao j
                             fireflies[i_firefly] = movement(fireflies[i_firefly], fireflies[j_firefly], beta, alpha)
                             #Avaliando o range das variáveis
                             fireflies[i_firefly] = evaluateRange(variable_range, fireflies[i_firefly])
-                            #file.write(f'    O novo vagalume {i_firefly} é {fireflies[i_firefly]}\n')
+                            file.write(f'    O novo vagalume {i_firefly} é {fireflies[i_firefly]}\n')
                             #Avaliando o novo vagalume
-                            light_intensities[i_firefly] = fitness(fireflies[i_firefly])
+                            light_intensities[i_firefly] = fitness(architecture, fireflies[i_firefly], dataset)
                             evaluations += 1
-                            #file.write(f'    Sua nova intensidade é {light_intensities[i_firefly]}\n')
+                            file.write(f'    Sua nova intensidade é {light_intensities[i_firefly]}\n')
                     j_firefly += 1
                 i_firefly +=1
                 j_firefly = 0
@@ -158,10 +163,10 @@ def fireflyAlgorithm(population_size, max_iteration):
         #file.write(f'{light_intensities}\n')
         #file.write(f'{fireflies}\n')
         file.write(f'Numero mais proximo de zero: {numero_mais_proximo_de_zero}\n')
-        file.write(f'Solução: {fireflies[indice_numero]}\n')
+        file.write(f'Solução: {fireflies[indice_numero]}, que é a solução: {indice_numero} da lista\n')
     
 
 
-population_size = 5
-max_iteration = 10
-fireflyAlgorithm(population_size, max_iteration)
+#population_size = 5
+#max_iteration = 10
+#fireflyAlgorithm(population_size, max_iteration)
