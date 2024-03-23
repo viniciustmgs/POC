@@ -50,10 +50,11 @@ def buildModel(solution, architecture, num_classes):
     else:
         raise ValueError("Optimizer not recognized")
 
+    precision = tf.keras.metrics.Precision()
+    recall = tf.keras.metrics.Recall()
+    f1score = tf.keras.metrics.F1Score()
+
     #Compilar o modelo
-    model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy',
-                                                                           tf.keras.metrics.Precision(),
-                                                                           tf.keras.metrics.Recall(), 
-                                                                           tf.keras.metrics.F1Score()])
+    model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy', precision, recall, f1score])
 
     return model

@@ -2,6 +2,7 @@ import math
 import numpy as np
 from fitness import fitness
 import random
+import time
 
 def initializeSolutions(population_size):
     solutions = []
@@ -44,14 +45,14 @@ def rastriginFunction(solution):
     final = total_sum + a_consant*6
     return final
 
-#def fitness(solution):
-    #best_solution = [45, 63, 83, 14, 27, 71]
-    #difference_sum = 0
-    #for index, variable in enumerate(solution):
-        #difference_sum += (variable - best_solution[index]) ** 2
-    #r = math.sqrt(difference_sum)
-    #fitness = 0 - r
-    #return fitness
+def fitness1(x, solution, y):
+    best_solution = [45, 63, 83, 14, 27, 71]
+    difference_sum = 0
+    for index, variable in enumerate(solution):
+        difference_sum += (variable - best_solution[index]) ** 2
+    r = math.sqrt(difference_sum)
+    fitness = 0 - r
+    return [fitness, [0, 0, 0, 0]]
 
 
 def relativeAttractiveness(beta0, gamma, r):
@@ -73,8 +74,8 @@ def calc_distance(i_firefly, j_firefly):
     return r
 
 def newAlpha(alpha):
-    if (alpha > 0.002):
-        return alpha - 0.002
+    if (alpha > 0.02):
+        return alpha - 0.02
     else:
         return alpha
     
@@ -95,11 +96,17 @@ def fireflyAlgorithm(population_size, max_iteration, architecture, dataset):
 
     #Calculando a intensidade de luz de cada vagalume
     light_intensities = []
+    results = []
     for index, firefly in enumerate(fireflies):
-        with open('metaheuristics/output.txt', 'w') as file:
+        with open('metaheuristics/output.txt', 'a') as file:
             file.write(f'Vagalume inicial {index+1}\n')
             file.write(f' Vagalume: {firefly}\n')
-        light_intensity = fitness(architecture, firefly, dataset)
+        fitness_result = fitness(architecture, firefly, dataset)
+        with open('metaheuristics/output.txt', 'a') as file:
+            file.write(f' Validação {fitness_result[1]}\n')
+            file.write(f' Fitness {fitness_result[0]}\n')
+        light_intensity = fitness_result[0]
+        results.append(fitness_result)
         light_intensities.append(light_intensity)
 
     #Definindo o coeficiente de absorção de luz
@@ -115,54 +122,72 @@ def fireflyAlgorithm(population_size, max_iteration, architecture, dataset):
     j_firefly = 1
     iteration = 0
     evaluations = 10
-    with open('metaheuristics/output.txt', 'w') as file:
-        file.write(f'População inicial: {fireflies}\n')
-        file.write(f'Intensidade inicial: {light_intensities}\n')
-        while iteration < max_iteration:
-            print(iteration)
+    
+    #file.write(f'População inicial: {fireflies}\n')
+    #for index, result in enumerate(results):
+        #file.write(f' Vagalume {index+1}: {fireflies[index]}\n')
+        #file.write(f'  Validação: {result[1]}\n')
+    #file.write(f'Intensidade inicial: {light_intensities}\n')
+    while iteration < max_iteration:
+        with open('metaheuristics/output.txt', 'a') as file:
             file.write(f'Começando a iteração {iteration}\n')
-            while i_firefly < population_size:
+        while i_firefly < population_size:
+            with open('metaheuristics/output.txt', 'a') as file:
                 file.write(f' AVALIANDO O VAGALUME {i_firefly}\n')
-                while j_firefly < population_size:
-                    if (i_firefly != j_firefly):
+            while j_firefly < population_size:
+                if (i_firefly != j_firefly):
+                    with open('metaheuristics/output.txt', 'a') as file:
                         file.write(f'  Comparando com o vagalume {j_firefly}\n')
-                        #Caso o vagalume j seja mais luminoso que o vagalume i
-                        if(light_intensities[i_firefly] < light_intensities[j_firefly]):
+                    #Caso o vagalume j seja mais luminoso que o vagalume i
+                    if(light_intensities[i_firefly] < light_intensities[j_firefly]):
+                        with open('metaheuristics/output.txt', 'a') as file:
                             file.write(f'    O vagalume {j_firefly} é mais luminoso que o vagalume {i_firefly}\n')
                             file.write(f'    Vagalume i: {fireflies[i_firefly]}\n')
                             file.write(f'    Vagalume j: {fireflies[j_firefly]}')
-                            #Calculando a distância entre os vagalumes
-                            r = calc_distance(fireflies[i_firefly], fireflies[j_firefly])
+                        #Calculando a distância entre os vagalumes
+                        r = calc_distance(fireflies[i_firefly], fireflies[j_firefly])
+                        with open('metaheuristics/output.txt', 'a') as file:
                             file.write(f'    A distância entre eles é de {r}\n')
-                            #Calculando a atratividade
-                            beta = relativeAttractiveness(beta0, gamma, r)
+                        #Calculando a atratividade
+                        beta = relativeAttractiveness(beta0, gamma, r)
+                        with open('metaheuristics/output.txt', 'a') as file:
                             file.write(f'    A atratividade entre eles é {beta}\n')
-                            #Movendo o vagalume i em direção ao j
-                            fireflies[i_firefly] = movement(fireflies[i_firefly], fireflies[j_firefly], beta, alpha)
-                            #Avaliando o range das variáveis
-                            fireflies[i_firefly] = evaluateRange(variable_range, fireflies[i_firefly])
+                        #Movendo o vagalume i em direção ao j
+                        fireflies[i_firefly] = movement(fireflies[i_firefly], fireflies[j_firefly], beta, alpha)
+                        #Avaliando o range das variáveis
+                        fireflies[i_firefly] = evaluateRange(variable_range, fireflies[i_firefly])
+                        with open('metaheuristics/output.txt', 'a') as file:
                             file.write(f'    O novo vagalume {i_firefly} é {fireflies[i_firefly]}\n')
-                            #Avaliando o novo vagalume
-                            light_intensities[i_firefly] = fitness(architecture, fireflies[i_firefly], dataset)
-                            evaluations += 1
+                        #Avaliando o novo vagalume
+                        fitness_result = fitness(architecture, fireflies[i_firefly], dataset)
+                        results[i_firefly] = fitness_result
+                        light_intensities[i_firefly] = fitness_result[0]
+                        with open('metaheuristics/output.txt', 'a') as file:
+                            file.write(f'    Validação: {fitness_result[1]}\n')
                             file.write(f'    Sua nova intensidade é {light_intensities[i_firefly]}\n')
-                    j_firefly += 1
-                i_firefly +=1
-                j_firefly = 0
-            i_firefly = 0
+                        evaluations += 1
+                j_firefly += 1
+            i_firefly +=1
+            j_firefly = 0
+        i_firefly = 0
+        with open('metaheuristics/output.txt', 'a') as file:
             file.write(f'Fim da iteraçao {iteration}\n')
             file.write(f'População atual: {fireflies}\n')
+            for index, result in enumerate(results):
+                file.write(f' Vagalume {index+1}: {fireflies[index]}\n')
+                file.write(f'  Validação: {result[1]}\n')
             file.write(f'Intensidades atuais: {light_intensities}\n')
             file.write(f'Numero de avaliações: {evaluations}\n')
             iteration += 1
             alpha = newAlpha(alpha)
             file.write(f'Novo alpha: {alpha}\n')
             beta0 = newBeta0(beta0)
-        numero_mais_proximo_de_zero = min(light_intensities, key=lambda x: abs(x))
-        indice_numero = light_intensities.index(numero_mais_proximo_de_zero)
-        #file.write(f'{light_intensities}\n')
-        #file.write(f'{fireflies}\n')
-        file.write(f'Numero mais proximo de zero: {numero_mais_proximo_de_zero}\n')
+    best_result = max(light_intensities)
+    indice_numero = light_intensities.index(best_result)
+    with open('metaheuristics/output.txt', 'a') as file:
+        file.write(f'FINAL:\n{light_intensities}\n')
+        file.write(f'{fireflies}\n')
+        file.write(f'Melhor fitness: {best_result}\n')
         file.write(f'Solução: {fireflies[indice_numero]}, que é a solução: {indice_numero} da lista\n')
     
 

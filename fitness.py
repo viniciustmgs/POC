@@ -24,10 +24,10 @@ def objective(train_generator, val_generator, test_generator, architecture, solu
     #Treinar o modelo
     history = model.fit(
         train_generator,
-        steps_per_epoch=int(train_generator.samples // train_generator.batch_size),
+        steps_per_epoch=train_generator.samples // train_generator.batch_size,
         epochs=32,
         validation_data=val_generator,
-        validation_steps=int(val_generator.samples // val_generator.batch_size),
+        validation_steps=val_generator.samples // val_generator.batch_size,
         callbacks=[early_stopping]
     )
 
@@ -41,30 +41,35 @@ def objective(train_generator, val_generator, test_generator, architecture, solu
                 val_accuracy = accuracy
                 val_accuracy_index = index
 
-    val_precision = history.history['val_precision'][val_accuracy_index]
-    val_recall = history.history['val_recall'][val_accuracy_index]
-    val_f1_score = history.history['val_f1_score'][val_accuracy_index]
-    mean_val_precision = tf.reduce_mean(val_precision)
+    f1_key = list(history.history.keys())[6]
+    precision_key = list(history.history.keys())[8]
+    recall_key = list(history.history.keys())[9]
+
+    val_precision = history.history[precision_key][val_accuracy_index]
+    val_recall = history.history[recall_key][val_accuracy_index]
+    val_f1_score = history.history[f1_key][val_accuracy_index]
+    mean_val_f1_score = tf.reduce_mean(val_f1_score)
+    #mean_val_precision = tf.reduce_mean(val_precision)
 
     #Avaliar o modelo no conjunto de teste
-    test_loss, test_accuracy, test_precision, test_recall, test_f1_score = model.evaluate(test_generator)
+    #test_loss, test_accuracy, test_precision, test_recall, test_f1_score = model.evaluate(test_generator)
 
     #Calcular a precisão média
-    mean_test_precision = tf.reduce_mean(test_precision)
+    #mean_test_precision = tf.reduce_mean(test_precision)
 
     #Imprimir as métricas
     print('Validation Accuracy:', val_accuracy)
-    print('Validation Precision:', mean_val_precision.numpy())
+    print('Validation Precision:', val_precision)
     print('Validation Recall:', val_recall)
-    print('Validation F1 Score: ', val_f1_score)
+    print('Validation F1 Score: ', mean_val_f1_score.numpy())
 
-    print('Test Accuracy:', test_accuracy)
-    print('Test Precision:', mean_test_precision.numpy())
-    print('Test Recall:', test_recall)
-    print('Test F1 Score: ', test_f1_score)
-    print('Test Loss: ', test_loss)
+    #print('Test Accuracy:', test_accuracy)
+    #print('Test Precision:', mean_test_precision.numpy())
+    #print('Test Recall:', test_recall)
+    #print('Test F1 Score: ', test_f1_score)
+    #print('Test Loss: ', test_loss)
 
-    return [[val_accuracy, mean_val_precision.numpy(), val_recall, val_f1_score], [test_accuracy, mean_test_precision.numpy(), test_recall, test_f1_score]]
+    return [val_accuracy, val_precision, val_recall, mean_val_f1_score.numpy()]
 
 def fitness(architecture, firefly, dataset):
     solution = translateSolution(firefly)
@@ -72,13 +77,11 @@ def fitness(architecture, firefly, dataset):
         train_generator, val_generator, test_generator = createGeneratorIP102(architecture)
     elif(dataset == 'D0'):
         train_generator, val_generator, test_generator = createGeneratorD0(architecture)
-    val_metrics, test_metrics = objective(train_generator, val_generator, test_generator, architecture, solution)
+    val_metrics = objective(train_generator, val_generator, test_generator, architecture, solution)
     val_accuracy, val_precision, val_recall, val_f1_score = val_metrics
     fitness_value = (val_accuracy + val_precision + val_recall + val_f1_score)/4
-    with open('metaheuristics/output.txt', 'w') as file:
-        file.write(f'     Val metrics: {val_metrics}\n')
-        file.write(f'     Test metrics: {test_metrics}\n')
-    return fitness_value*100
+    print(fitness_value*100)
+    return [fitness_value*100, val_metrics]
 
 
 #architecture = 'ResNet152'
