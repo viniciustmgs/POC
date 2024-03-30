@@ -52,10 +52,10 @@ def objective(train_generator, val_generator, test_generator, architecture, solu
     #mean_val_precision = tf.reduce_mean(val_precision)
 
     #Avaliar o modelo no conjunto de teste
-    #test_loss, test_accuracy, test_precision, test_recall, test_f1_score = model.evaluate(test_generator)
+    test_loss, test_accuracy, test_precision, test_recall, test_f1_score = model.evaluate(test_generator)
 
     #Calcular a precisão média
-    #mean_test_precision = tf.reduce_mean(test_precision)
+    mean_test_precision = tf.reduce_mean(test_precision)
 
     #Imprimir as métricas
     print('Validation Accuracy:', val_accuracy)
@@ -63,13 +63,14 @@ def objective(train_generator, val_generator, test_generator, architecture, solu
     print('Validation Recall:', val_recall)
     print('Validation F1 Score: ', mean_val_f1_score.numpy())
 
-    #print('Test Accuracy:', test_accuracy)
-    #print('Test Precision:', mean_test_precision.numpy())
-    #print('Test Recall:', test_recall)
-    #print('Test F1 Score: ', test_f1_score)
+    print('Test Accuracy:', test_accuracy)
+    print('Test Precision:', mean_test_precision.numpy())
+    print('Test Recall:', test_recall)
+    print('Test F1 Score: ', test_f1_score)
     #print('Test Loss: ', test_loss)
 
-    return [val_accuracy, val_precision, val_recall, mean_val_f1_score.numpy()]
+    return [test_accuracy, mean_test_precision.numpy(), test_recall, test_f1_score]
+    #return [val_accuracy, val_precision, val_recall, mean_val_f1_score.numpy()]
 
 def fitness(architecture, firefly, dataset):
     solution = translateSolution(firefly)
@@ -77,11 +78,14 @@ def fitness(architecture, firefly, dataset):
         train_generator, val_generator, test_generator = createGeneratorIP102(architecture)
     elif(dataset == 'D0'):
         train_generator, val_generator, test_generator = createGeneratorD0(architecture)
-    val_metrics = objective(train_generator, val_generator, test_generator, architecture, solution)
-    val_accuracy, val_precision, val_recall, val_f1_score = val_metrics
-    fitness_value = (val_accuracy + val_precision + val_recall + val_f1_score)/4
+    test_metrics = objective(train_generator, val_generator, test_generator, architecture, solution)
+    test_accuracy, test_precision, test_recall, test_f1_score = test_metrics
+    fitness_value = (test_accuracy + test_precision + test_recall + test_f1_score)/4
     print(fitness_value*100)
-    return [fitness_value*100, val_metrics]
+    with open('metaheuristics/fitnessValue.txt', 'w') as file:
+            file.write(f'{fitness_value*100}\n')
+            file.write(f'{test_metrics}')
+    #return [fitness_value*100, val_metrics]
 
 
 #architecture = 'ResNet152'

@@ -3,6 +3,7 @@ import numpy as np
 from fitness import fitness
 import random
 import time
+import multiprocessing
 
 def initializeSolutions(population_size):
     solutions = []
@@ -81,13 +82,22 @@ def newAlpha(alpha):
     
 def newBeta0(beta0):
     if (beta0 > 1):
-        new_beta0 = beta0 - 5
+        new_beta0 = beta0 - 6
         if new_beta0 <= 0:
             return 1
         else:
             return new_beta0
     else:
         return beta0
+    
+def getFitness(architecture, firefly, dataset):
+    new_process = multiprocessing.Process(target=fitness, args=(architecture, firefly, dataset))
+    new_process.start()
+    new_process.join()
+    with open('metaheuristics/fitnessValue.txt', 'r') as file:
+        linha1 = file.readline()
+        linha2 = file.readline()
+    return [float(linha1), linha2]
 
 def fireflyAlgorithm(population_size, max_iteration, architecture, dataset):
     
@@ -101,10 +111,10 @@ def fireflyAlgorithm(population_size, max_iteration, architecture, dataset):
         with open('metaheuristics/output.txt', 'a') as file:
             file.write(f'Vagalume inicial {index+1}\n')
             file.write(f' Vagalume: {firefly}\n')
-        fitness_result = fitness(architecture, firefly, dataset)
+        fitness_result = getFitness(architecture, firefly, dataset)
         with open('metaheuristics/output.txt', 'a') as file:
-            file.write(f' Validação {fitness_result[1]}\n')
-            file.write(f' Fitness {fitness_result[0]}\n')
+            file.write(f' Teste: {fitness_result[1]}\n')
+            file.write(f' Fitness: {fitness_result[0]}\n')
         light_intensity = fitness_result[0]
         results.append(fitness_result)
         light_intensities.append(light_intensity)
@@ -114,14 +124,15 @@ def fireflyAlgorithm(population_size, max_iteration, architecture, dataset):
     #Definindo o alpha (step size)
     alpha = 0.5
     #Definindo a atratividade inicial
-    beta0 = 100
+    beta0 = 60
     #Definindo o range das variáveis
     variable_range = [0, 100]
 
     i_firefly = 0
     j_firefly = 1
     iteration = 0
-    evaluations = 10
+    evaluations = 5
+    max_beta = 1.4
     
     #file.write(f'População inicial: {fireflies}\n')
     #for index, result in enumerate(results):
@@ -143,13 +154,15 @@ def fireflyAlgorithm(population_size, max_iteration, architecture, dataset):
                         with open('metaheuristics/output.txt', 'a') as file:
                             file.write(f'    O vagalume {j_firefly} é mais luminoso que o vagalume {i_firefly}\n')
                             file.write(f'    Vagalume i: {fireflies[i_firefly]}\n')
-                            file.write(f'    Vagalume j: {fireflies[j_firefly]}')
+                            file.write(f'    Vagalume j: {fireflies[j_firefly]}\n')
                         #Calculando a distância entre os vagalumes
                         r = calc_distance(fireflies[i_firefly], fireflies[j_firefly])
                         with open('metaheuristics/output.txt', 'a') as file:
                             file.write(f'    A distância entre eles é de {r}\n')
                         #Calculando a atratividade
                         beta = relativeAttractiveness(beta0, gamma, r)
+                        if beta > max_beta:
+                            beta = max_beta
                         with open('metaheuristics/output.txt', 'a') as file:
                             file.write(f'    A atratividade entre eles é {beta}\n')
                         #Movendo o vagalume i em direção ao j
@@ -159,12 +172,12 @@ def fireflyAlgorithm(population_size, max_iteration, architecture, dataset):
                         with open('metaheuristics/output.txt', 'a') as file:
                             file.write(f'    O novo vagalume {i_firefly} é {fireflies[i_firefly]}\n')
                         #Avaliando o novo vagalume
-                        fitness_result = fitness(architecture, fireflies[i_firefly], dataset)
+                        fitness_result = getFitness(architecture, fireflies[i_firefly], dataset)
                         results[i_firefly] = fitness_result
                         light_intensities[i_firefly] = fitness_result[0]
                         with open('metaheuristics/output.txt', 'a') as file:
-                            file.write(f'    Validação: {fitness_result[1]}\n')
-                            file.write(f'    Sua nova intensidade é {light_intensities[i_firefly]}\n')
+                            file.write(f'    Teste: {fitness_result[1]}\n')
+                            file.write(f'    Sua nova intensidade é: {light_intensities[i_firefly]}\n')
                         evaluations += 1
                 j_firefly += 1
             i_firefly +=1
@@ -182,11 +195,14 @@ def fireflyAlgorithm(population_size, max_iteration, architecture, dataset):
             alpha = newAlpha(alpha)
             file.write(f'Novo alpha: {alpha}\n')
             beta0 = newBeta0(beta0)
+            file.write(f'Novo Beta0: {beta0}\n')
+        if iteration > 6:
+            max_beta = max_beta - 0.1
     best_result = max(light_intensities)
     indice_numero = light_intensities.index(best_result)
     with open('metaheuristics/output.txt', 'a') as file:
-        file.write(f'FINAL:\n{light_intensities}\n')
-        file.write(f'{fireflies}\n')
+        file.write(f'FINAL:\nFitness: {light_intensities}\n')
+        file.write(f'Soluções: {fireflies}\n')
         file.write(f'Melhor fitness: {best_result}\n')
         file.write(f'Solução: {fireflies[indice_numero]}, que é a solução: {indice_numero} da lista\n')
     
