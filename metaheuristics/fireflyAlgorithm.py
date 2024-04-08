@@ -82,7 +82,7 @@ def newAlpha(alpha):
     
 def newBeta0(beta0):
     if (beta0 > 1):
-        new_beta0 = beta0 - 6
+        new_beta0 = beta0 - 7
         if new_beta0 <= 0:
             return 1
         else:
