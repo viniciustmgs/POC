@@ -18,11 +18,11 @@ def initializeSolutions(population_size):
         iteration += 1
     
     solutions_final = []
-    solutions_final.append([2.358836786205785, 37.45997783882255, 67.44559018510525, 38.00087782108869, 23.299013060447106, 9.552042566979603])
-    solutions_final.append([40.71391124777651, 2.7811499917270983, 96.40788864041897, 34.23908052256207, 73.41448683706867, 97.24760872091123])
-    solutions_final.append([2.0192995076601727, 80.24773450942463, 24.649521199633178, 42.30237637542739, 31.986540324256417, 70.92974501076516])
-    solutions_final.append([71.62758811761954, 22.831860217858793, 62.63227140129599, 78.62384207496163, 91.12570896184265, 48.55731987262155])
-    solutions_final.append([80.90879054665174, 16.998334779834305, 36.01401351419814, 35.61360728240461, 58.519501503012336, 6.968883318062959])
+    solutions_final.append([11.499554973115636, 32.92269913947895, 60.059557247780326, 69.8374361522773, 88.85111898051524, 63.490856172730815])
+    solutions_final.append([65.67673740164794, 98.61176833217881, 47.76735516247464, 68.93788061953468, 12.268587499642768, 41.95044817614475])
+    solutions_final.append([86.38273646563997, 51.187983967118676, 28.37760624510574, 35.40911043154452, 68.2406547583104, 27.10322464367496])
+    solutions_final.append([96.43829013829371, 29.244710425267087, 38.137446570965565, 26.390202307543262, 67.95198374746627, 55.31462601409839])
+    solutions_final.append([92.42742614135106, 15.41818397179828, 67.98943208423547, 35.43338750266395, 58.330388445315165, 83.48410294468948])
     return solutions_final
 
 def evaluateRange(variable_range, solution):
@@ -110,7 +110,6 @@ def fireflyAlgorithm(population_size, max_iteration, architecture, dataset):
     #Inicialiazndo a população de vagalumes
     fireflies = initializeSolutions(population_size)
 
-    #Calculando a intensidade de luz de cada vagalume
     light_intensities = []
     results = []
     for index, firefly in enumerate(fireflies):
@@ -139,12 +138,7 @@ def fireflyAlgorithm(population_size, max_iteration, architecture, dataset):
     iteration = 0
     evaluations = 5
     max_beta = 1.4
-    
-    #file.write(f'População inicial: {fireflies}\n')
-    #for index, result in enumerate(results):
-        #file.write(f' Vagalume {index+1}: {fireflies[index]}\n')
-        #file.write(f'  Validação: {result[1]}\n')
-    #file.write(f'Intensidade inicial: {light_intensities}\n')
+
     while iteration < max_iteration:
         with open('metaheuristics/output.txt', 'a') as file:
             file.write(f'Começando a iteração {iteration}\n')
@@ -211,9 +205,3 @@ def fireflyAlgorithm(population_size, max_iteration, architecture, dataset):
         file.write(f'Soluções: {fireflies}\n')
         file.write(f'Melhor fitness: {best_result}\n')
         file.write(f'Solução: {fireflies[indice_numero]}, que é a solução: {indice_numero} da lista\n')
-    
-
-
-#population_size = 5
-#max_iteration = 10
-#fireflyAlgorithm(population_size, max_iteration)
