@@ -2,6 +2,7 @@ from keras.callbacks import EarlyStopping
 from generators.ip102Generator import createGeneratorIP102
 from generators.d0Generator import createGeneratorD0
 from generators.mcwGenerator import createGeneratorMCW
+from generators.piGenerator import createGeneratorPI
 from model import buildModel
 import tensorflow as tf
 from translateSolution import translateSolution
@@ -80,7 +81,9 @@ def fitness(architecture, firefly, dataset):
     elif(dataset == 'D0'):
         train_generator, val_generator, test_generator = createGeneratorD0(architecture)
     elif(dataset == 'MCW'):
-         train_generator, val_generator, test_generator = createGeneratorMCW(architecture)
+        train_generator, val_generator, test_generator = createGeneratorMCW(architecture)
+    elif(dataset == 'PI'):
+        train_generator, val_generator, test_generator = createGeneratorPI(architecture)
     test_metrics = objective(train_generator, val_generator, test_generator, architecture, solution)
     test_accuracy, test_precision, test_recall, test_f1_score = test_metrics
     fitness_value = (test_accuracy + test_precision + test_recall + test_f1_score)/4
