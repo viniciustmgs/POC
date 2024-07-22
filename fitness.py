@@ -1,5 +1,5 @@
 from keras.callbacks import EarlyStopping
-from generators.ip102Generator import createGeneratorIP102
+from generators.mLGenerator import createGeneratorMl
 from generators.d0Generator import createGeneratorD0
 from generators.mcwGenerator import createGeneratorMCW
 from generators.piGenerator import createGeneratorPI
@@ -76,8 +76,8 @@ def objective(train_generator, val_generator, test_generator, architecture, solu
 
 def fitness(architecture, firefly, dataset):
     solution = translateSolution(firefly)
-    if (dataset == 'IP102'):
-        train_generator, val_generator, test_generator = createGeneratorIP102(architecture)
+    if (dataset == 'ML'):
+        train_generator, val_generator, test_generator = createGeneratorMl(architecture)
     elif(dataset == 'D0'):
         train_generator, val_generator, test_generator = createGeneratorD0(architecture)
     elif(dataset == 'MCW'):
@@ -92,10 +92,3 @@ def fitness(architecture, firefly, dataset):
             file.write(f'{fitness_value*100}\n')
             file.write(f'{test_metrics}')
     #return [fitness_value*100, val_metrics]
-
-
-#architecture = 'ResNet152'
-#solution=[0.09, 0.27, 'adagrad', 4, 4096, 0.01]
-#solution=[0.3, 0.3, 'sgd', 3, 1024, 0.01]
-#train_generator, val_generator, test_generator = createGeneratorD0(architecture)
-#objective(train_generator, val_generator, test_generator, architecture, solution)

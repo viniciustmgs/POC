@@ -18,11 +18,11 @@ def initializeSolutions(population_size):
         iteration += 1
     
     solutions_final = []
-    solutions_final.append([46.88524839424082, 51.86866337847884, 85.39446375466967, 31.533016233273894, 53.335413369893, 67.87439670677061])
-    solutions_final.append([89.51039975850848, 58.720620769939835, 28.871354785187453, 91.65928737075089, 22.811480609415007, 43.09756979407061])
+    solutions_final.append([77.26194825994055, 37.16196110434434, 28.08045656905951, 38.214451952352526, 81.93588574976164, 15.566782999311025])
     solutions_final.append([85.40298263639033, 19.10105934260443, 7.015957663102827, 3.487774708633453, 32.7893224774369, 35.27202388388382])
-    solutions_final.append([18.6713590506087, 35.696006006642364, 0.14946322974989207, 94.22229642073498, 80.28354640323619, 33.13677384388251])
-    solutions_final.append([89.71168665120753, 18.378223464783662, 55.792564759130684, 74.14765462066151, 90.04079963664839, 8.180325827974821])
+    solutions_final.append([64.39507856953408, 9.206258208786325, 96.14753213334137, 76.47615805695354, 14.513636623915364, 28.774393555576488])
+    solutions_final.append([12.235485478347925, 25.476839519364926, 72.4710283948204, 70.29384950192839, 92.01928374018593, 10.290240127492572])
+    solutions_final.append([45.97169274975026, 45.31561412069895, 74.24607171179431, 12.056669447629599, 33.5288247107257, 13.246070371710573])
     return solutions_final
 
 def evaluateRange(variable_range, solution):
@@ -112,6 +112,7 @@ def fireflyAlgorithm(population_size, max_iteration, architecture, dataset):
 
     light_intensities = []
     results = []
+    
     for index, firefly in enumerate(fireflies):
         with open('metaheuristics/output.txt', 'a') as file:
             file.write(f'Vagalume inicial {index+1}\n')
@@ -123,6 +124,7 @@ def fireflyAlgorithm(population_size, max_iteration, architecture, dataset):
         light_intensity = fitness_result[0]
         results.append(fitness_result)
         light_intensities.append(light_intensity)
+    
 
     #Definindo o coeficiente de absorção de luz
     gamma = 0.1

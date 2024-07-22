@@ -2,13 +2,15 @@ import os
 import shutil
 from sklearn.model_selection import train_test_split
 
-directory_name = 'Pistachio_Image_Dataset'
+#NOME DO DIRETORIO, MUDAR PARA OS DIFERENTES DATASETS
+directory_name = 'malaria'
+
 # Diretório raiz do seu dataset
-dataset_dir = 'data/Pistachio_Image_Dataset'
+dataset_dir = f'data/{directory_name}'
 
 # Diretório de destino para os conjuntos de treinamento e teste
-train_dir = 'data/Pistachio_Image_Dataset/train'
-test_dir = 'data/Pistachio_Image_Dataset/test'
+train_dir = f'data/{directory_name}/train'
+test_dir = f'data/{directory_name}/test'
 
 # Lista para armazenar os caminhos das imagens e seus respectivos rótulos
 images = []
