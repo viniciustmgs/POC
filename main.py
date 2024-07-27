@@ -1,6 +1,6 @@
 from metaheuristics.fireflyAlgorithm import fireflyAlgorithm
 
-architecture = 'ResNet152'
+architecture = 'Xception'
 dataset = 'ML'
 population_size = 5
 max_iteration = 10
